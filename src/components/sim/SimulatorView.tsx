@@ -70,6 +70,9 @@ export function SimulatorView({ world }: { world: World }) {
   const selectedRef = useRef(selectedId);
   selectedRef.current = selectedId;
 
+  const [following, setFollowing] = useState(false);
+  const followRef = useRef(following);
+  followRef.current = following;
   const [zoneId, setZoneId] = useState<ZoneId>(START_ZONE);
   const [settings, setSettings] = useState<SimSettings>(DEFAULT_SETTINGS);
   const [stats, setStats] = useState<SimStats | null>(null);
@@ -141,6 +144,14 @@ export function SimulatorView({ world }: { world: World }) {
         }
         if (n === 12) acc = 0;
       }
+      if (followRef.current && selectedRef.current != null) {
+        const v = sim.find(selectedRef.current);
+        if (v) {
+          const cam = camRef.current;
+          cam.cx += (v.x - cam.cx) * 0.25;
+          cam.cy += (v.y - cam.cy) * 0.25;
+        }
+      }
       const { w, h, dpr } = sizeRef.current;
       const zone = zoneRef.current === "overview" ? null : zoneBounds(zoneRef.current);
       renderer.draw(ctx, camRef.current, w, h, dpr, sim, {
@@ -162,6 +173,7 @@ export function SimulatorView({ world }: { world: World }) {
           else {
             setSelected(null);
             setSelectedId(null);
+            setFollowing(false);
           }
         }
       }
@@ -202,7 +214,19 @@ export function SimulatorView({ world }: { world: World }) {
     }
     setSelectedId(best ? best.id : null);
     setSelected(best ? describe(sim, best) : null);
+    if (!best) setFollowing(false);
+  }, () => {
+    if (followRef.current) setFollowing(false);
   });
+
+  const toggleFollow = () => {
+    if (!following) {
+      const cam = camRef.current;
+      const { w, h } = sizeRef.current;
+      if (cam.zoom < 3) zoomAt(cam, 4, w / 2, h / 2, w, h);
+    }
+    setFollowing((f) => !f);
+  };
 
   const changeZone = (id: ZoneId) => {
     setZoneId(id);
@@ -213,6 +237,7 @@ export function SimulatorView({ world }: { world: World }) {
     fitBounds(camRef.current, zoneBounds(id), w, h);
     setSelectedId(null);
     setSelected(null);
+    setFollowing(false);
   };
 
   const reset = () => {
@@ -220,6 +245,7 @@ export function SimulatorView({ world }: { world: World }) {
     simRef.current?.reset(undefined, seedRef.current);
     setSelectedId(null);
     setSelected(null);
+    setFollowing(false);
   };
 
   const updateSettings = (s: SimSettings) => {
@@ -278,9 +304,12 @@ export function SimulatorView({ world }: { world: World }) {
             {selected && (
               <VehicleInspector
                 info={selected}
+                following={following}
+                onFollow={toggleFollow}
                 onClose={() => {
                   setSelectedId(null);
                   setSelected(null);
+                  setFollowing(false);
                 }}
               />
             )}

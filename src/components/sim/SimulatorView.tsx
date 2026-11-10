@@ -160,7 +160,7 @@ export function SimulatorView({ world }: { world: World }) {
         zone,
       });
       if (!readyMarked) {
-        wrap.dataset.sceneReady = "true";
+        wrap.dataset["sceneReady"] = "true";
         readyMarked = true;
       }
       if (now - lastUi > 250) {

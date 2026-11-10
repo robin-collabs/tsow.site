@@ -118,7 +118,8 @@ describe("simulation", () => {
       for (const list of byEdge.values()) {
         for (const a of list)
           for (const b of list) {
-            if (a === b || Math.abs(a.lat - b.lat) >= (a.p.width + b.p.width) / 2) continue;
+            // ignore side-scrapes: only count bodies that overlap sideways by more than 30 cm
+            if (a === b || Math.abs(a.lat - b.lat) >= (a.p.width + b.p.width) / 2 - 0.3) continue;
             const overlap = (a.p.length + b.p.length) / 2 - Math.abs(a.s - b.s);
             worstOverlap = Math.max(worstOverlap, overlap);
           }

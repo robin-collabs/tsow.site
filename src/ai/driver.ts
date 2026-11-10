@@ -77,7 +77,9 @@ function mustYield(A: Vehicle, Ek: DEdge, dEnd: number, next: DEdge, P: Percepti
   for (const C of list) {
     if (C === A) continue;
     const Ce = P.graph.edges[C.route[C.ri]!]!;
-    if (Ce.road === Ek.road || Ce.road === next.road) continue;
+    const merging = C.route[C.ri + 1] === next.id;
+    // Oncoming traffic on our own road / the road we enter only conflicts if it merges into our exit.
+    if (!merging && (Ce.road === Ek.road || Ce.road === next.road)) continue;
     const dC = Ce.len - C.s;
     if (dC > 20) continue;
     if (Ce.cls < Ek.cls) return true;

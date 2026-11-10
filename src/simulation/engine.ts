@@ -94,6 +94,8 @@ export class Simulation {
     if (!edgeList.length) return false;
     const E = this.graph.edges[edgeList[Math.floor(this.rand() * edgeList.length)]!]!;
     if (E.len < 24) return false;
+    // Favour arterial roads so traffic gathers where it does in the real city.
+    if (E.cls >= 2 && this.rand() < 0.6) return false;
     const s = 8 + this.rand() * (E.len - 16);
     if (this.vehicles.some((v) => v.route[v.ri] === E.id && Math.abs(v.s - s) < 16)) return false;
     const dest = this.pickDest(E.to);

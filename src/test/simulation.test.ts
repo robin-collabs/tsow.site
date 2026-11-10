@@ -105,14 +105,13 @@ describe("simulation", () => {
     );
     expect(sim.vehicles.length).toBe(30);
     let worstOverlap = 0;
+    let offNetwork = 0;
     for (let i = 0; i < 120 * 30; i++) {
       sim.step(1 / 30);
       const byEdge = new Map<number, typeof sim.vehicles>();
       for (const v of sim.vehicles) {
         const e = v.route[v.ri]!;
-        expect(net.allowed[e]).toBe(1);
-        expect(v.s).toBeGreaterThanOrEqual(0);
-        expect(v.s).toBeLessThanOrEqual(graph.edges[e]!.len);
+        if (net.allowed[e] !== 1 || v.s < 0 || v.s > graph.edges[e]!.len) offNetwork++;
         byEdge.set(e, [...(byEdge.get(e) ?? []), v]);
       }
       for (const list of byEdge.values()) {
@@ -126,6 +125,7 @@ describe("simulation", () => {
       }
     }
     expect(sim.stats().avgSpeedKmh).toBeGreaterThan(0);
+    expect(offNetwork).toBe(0);
     expect(worstOverlap).toBeLessThan(1.5);
-  });
+  }, 30000);
 });

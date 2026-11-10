@@ -182,8 +182,8 @@ export class Renderer {
     const selected = opts.selectedId != null ? sim.find(opts.selectedId) : undefined;
     if (selected) {
       ctx.strokeStyle = pal.accent;
-      ctx.globalAlpha = 0.7;
-      ctx.lineWidth = Math.max(1.2, 3 * px);
+      ctx.globalAlpha = 0.45;
+      ctx.lineWidth = Math.max(0.6, 2.5 * px);
       ctx.beginPath();
       for (let i = selected.ri; i < selected.route.length; i++) {
         const pts = this.graph.edges[selected.route[i]!]!.pts;

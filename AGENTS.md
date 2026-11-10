@@ -28,3 +28,12 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Simulator code is split by concern: `src/geographic` (dataset + zones), `src/road-network` (graph, zone SCC, A*), `src/vehicles` (type parameter table), `src/ai` (IDM + driving policy), `src/simulation` (engine, signals, settings), `src/rendering` (canvas), `src/controls` (input, storage), `src/components/sim` (UI). Why: keeps physics, AI and drawing independently testable.
+- Vehicle behaviour differences live only in `VEHICLE_TYPES`; never fork per-type simulation code. Why: spec requires parameter-driven behaviour.
+- Road data is a static file in `public/data`, fetched via `import.meta.env.BASE_URL`; regenerate it with `scripts/osm/*`, never call Overpass at runtime. Why: offline/static hosting and GitHub Pages subpaths.
+- Per-frame state stays in refs/plain objects; React state updates at most ~4 Hz. Simulation steps at fixed 1/30 s. Why: smooth canvas without re-render churn.
+- Lateral offsets are positive to the left of travel; lane 0 is the kerb lane (India drives on the left).
+- The `/` route is `ssr: false` because the simulator needs browser APIs.

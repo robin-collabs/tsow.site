@@ -45,9 +45,12 @@ export function drawVehicle(
 
   if (z < 0.35) {
     ctx.fillStyle = A.color;
+    ctx.strokeStyle = pal.rider;
+    ctx.lineWidth = px;
     ctx.beginPath();
-    ctx.arc(A.x, A.y, Math.max(hl, (p.type === "truck" ? 3.2 : 2.4) * px), 0, Math.PI * 2);
+    ctx.arc(A.x, A.y, Math.max(hl, (p.type === "truck" ? 4.2 : p.type === "bike" ? 2.8 : 3.4) * px), 0, Math.PI * 2);
     ctx.fill();
+    ctx.stroke();
     return;
   }
   // Exaggerate small vehicles at mid zoom so they stay readable.

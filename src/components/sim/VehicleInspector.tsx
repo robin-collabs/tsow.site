@@ -1,4 +1,5 @@
-import { X } from "lucide-react";
+import { Crosshair, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { VehicleType } from "@/vehicles/types";
 import { Panel, PanelTitle } from "./Panel";
 
@@ -16,7 +17,17 @@ export interface SelectedInfo {
   trips: number;
 }
 
-export function VehicleInspector({ info, onClose }: { info: SelectedInfo; onClose: () => void }) {
+export function VehicleInspector({
+  info,
+  following,
+  onFollow,
+  onClose,
+}: {
+  info: SelectedInfo;
+  following: boolean;
+  onFollow: () => void;
+  onClose: () => void;
+}) {
   const rows: [string, string][] = [
     ["Speed", `${info.speedKmh.toFixed(0)} km/h`],
     ["Doing", info.state],
@@ -45,6 +56,10 @@ export function VehicleInspector({ info, onClose }: { info: SelectedInfo; onClos
           </div>
         ))}
       </div>
+      <Button size="sm" variant={following ? "default" : "secondary"} className="mt-3 w-full" onClick={onFollow}>
+        <Crosshair />
+        {following ? "Following — drag map to stop" : "Follow this vehicle"}
+      </Button>
     </Panel>
   );
 }

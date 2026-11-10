@@ -6,9 +6,12 @@ export function useMapInput(
   canvasRef: RefObject<HTMLCanvasElement | null>,
   camRef: RefObject<Camera>,
   onTap: (sx: number, sy: number) => void,
+  onPan?: () => void,
 ) {
   const tapRef = useRef(onTap);
   tapRef.current = onTap;
+  const panRef = useRef(onPan);
+  panRef.current = onPan;
 
   useEffect(() => {
     const el = canvasRef.current;
@@ -32,6 +35,7 @@ export function useMapInput(
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
       moved += Math.abs(dx) + Math.abs(dy);
+      if (moved >= 5) panRef.current?.();
       cam.cx -= dx / cam.zoom;
       cam.cy -= dy / cam.zoom;
       lastX = e.clientX;

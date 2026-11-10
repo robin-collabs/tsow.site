@@ -223,7 +223,7 @@ export function SimulatorView({ world }: { world: World }) {
     if (!following) {
       const cam = camRef.current;
       const { w, h } = sizeRef.current;
-      if (cam.zoom < 3) zoomAt(cam, 4, w / 2, h / 2, w, h);
+      if (cam.zoom < 6) zoomAt(cam, 9, w / 2, h / 2, w, h);
     }
     setFollowing((f) => !f);
   };

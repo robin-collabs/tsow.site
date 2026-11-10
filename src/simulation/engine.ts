@@ -2,7 +2,7 @@ import { drive, type Perception } from "@/ai/driver";
 import { laneCenter, latBounds, pointAt, type EdgePoint, type RoadGraph } from "@/road-network/graph";
 import { findRoute } from "@/road-network/router";
 import type { ZoneNetwork } from "@/road-network/zone-network";
-import { VEHICLE_ORDER, VEHICLE_TYPES, shade, type VehicleType } from "@/vehicles/types";
+import { VEHICLE_TYPES, shade, type VehicleType } from "@/vehicles/types";
 import type { Vehicle } from "@/vehicles/vehicle";
 import { mulberry32 } from "./random";
 import { pickWeighted, type SimSettings } from "./settings";
@@ -302,4 +302,4 @@ export class Simulation {
   }
 }
 
-export { VEHICLE_ORDER };
+

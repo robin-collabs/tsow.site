@@ -15,6 +15,6 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
     // GitHub Pages build (tag workflow only): emit a static SPA shell.
-    ...(process.env.GITHUB_PAGES ? { spa: { enabled: true } } : {}),
+    ...(process.env['GITHUB_PAGES'] ? { spa: { enabled: true } } : {}),
   },
 });

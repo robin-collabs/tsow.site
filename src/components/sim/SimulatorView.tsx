@@ -20,6 +20,8 @@ import { Panel } from "./Panel";
 import { SettingsPanel } from "./SettingsPanel";
 import { StatsPanel } from "./StatsPanel";
 import { VehicleInspector, type SelectedInfo } from "./VehicleInspector";
+import { RouteMinimap } from "./RouteMinimap";
+import { trafficLevel } from "@/simulation/traffic";
 
 export interface World {
   ds: RoadDataset;
@@ -45,7 +47,26 @@ function describe(sim: Simulation, v: Vehicle): SelectedInfo {
     lanes: E.lanes,
     remainingKm: sim.remainingKm(v),
     trips: v.trips,
+    path: routePath(sim, v),
   };
+}
+
+function routePath(sim: Simulation, v: Vehicle): SelectedInfo["path"] {
+  const sum = new Map<number, [number, number]>();
+  for (const o of sim.vehicles) {
+    const e = o.route[o.ri]!;
+    const a = sum.get(e) ?? [0, 0];
+    a[0] += o.v;
+    a[1] += 1;
+    sum.set(e, a);
+  }
+  const out: SelectedInfo["path"] = [];
+  for (let i = v.ri; i < v.route.length; i++) {
+    const E = sim.graph.edges[v.route[i]!]!;
+    const a = sum.get(E.id);
+    out.push({ pts: E.pts, level: trafficLevel(a ? a[0] / a[1] : null, E.speed) });
+  }
+  return out;
 }
 
 export function SimulatorView({ world }: { world: World }) {
@@ -302,6 +323,8 @@ export function SimulatorView({ world }: { world: World }) {
           </div>
           <div className="flex items-end gap-3">
             {selected && (
+              <div className="flex flex-col gap-3">
+              {following && <RouteMinimap path={selected.path} color={selected.color} />}
               <VehicleInspector
                 info={selected}
                 following={following}
@@ -312,6 +335,7 @@ export function SimulatorView({ world }: { world: World }) {
                   setFollowing(false);
                 }}
               />
+              </div>
             )}
             <Panel className="flex flex-col p-1">
               <button onClick={() => zoomBy(1.4)} className="rounded p-2 hover:bg-accent" aria-label="Zoom in">

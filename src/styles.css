@@ -75,6 +75,9 @@
 }
 
 :root {
+  --route-free: oklch(0.6 0.18 255);
+  --route-slow: oklch(0.78 0.16 75);
+  --route-jam: oklch(0.6 0.22 27);
   --radius: 0.5rem;
   --background: oklch(0.17 0.012 250);
   --foreground: oklch(0.95 0.008 90);

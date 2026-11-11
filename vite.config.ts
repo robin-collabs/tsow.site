@@ -14,5 +14,7 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    // GitHub Pages build (tag workflow only): emit a static SPA shell.
+    ...(process.env.GITHUB_PAGES ? { spa: { enabled: true } } : {}),
   },
 });

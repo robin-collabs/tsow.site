@@ -37,9 +37,9 @@ function testDataset(): RoadDataset {
 }
 
 describe("vehicle count", () => {
-  it("is limited to between 30 and 100", () => {
+  it("is limited to between 30 and 300", () => {
     expect(clampVehicleCount(10)).toBe(30);
-    expect(clampVehicleCount(150)).toBe(100);
+    expect(clampVehicleCount(450)).toBe(300);
     expect(clampVehicleCount(64)).toBe(64);
   });
 });

@@ -15,6 +15,8 @@ export interface SelectedInfo {
   lanes: number;
   remainingKm: number;
   trips: number;
+  /** remaining route edges with traffic level 0 free, 1 slow, 2 jammed */
+  path: { pts: number[]; level: 0 | 1 | 2 }[];
 }
 
 export function VehicleInspector({
@@ -37,7 +39,7 @@ export function VehicleInspector({
     ["Trips done", String(info.trips)],
   ];
   return (
-    <Panel className="w-[240px] p-3">
+    <Panel className="w-[340px] p-3">
       <div className="flex items-start justify-between">
         <PanelTitle>Selected vehicle</PanelTitle>
         <button onClick={onClose} className="-mt-1 rounded p-1 hover:bg-accent" aria-label="Deselect">
@@ -47,19 +49,19 @@ export function VehicleInspector({
       <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
         <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: info.color }} />
         {info.label} <span className="font-mono text-xs text-muted-foreground">#{info.id}</span>
+        <Button size="sm" variant={following ? "default" : "secondary"} className="ml-auto h-7" onClick={onFollow}>
+          <Crosshair />
+          {following ? "Following" : "Follow"}
+        </Button>
       </div>
       <div className="space-y-1">
         {rows.map(([k, v]) => (
           <div key={k} className="flex justify-between gap-3 text-xs">
             <span className="shrink-0 text-muted-foreground">{k}</span>
-            <span className="truncate text-right font-mono">{v}</span>
+            <span className="break-words text-right font-mono">{v}</span>
           </div>
         ))}
       </div>
-      <Button size="sm" variant={following ? "default" : "secondary"} className="mt-3 w-full" onClick={onFollow}>
-        <Crosshair />
-        {following ? "Following — drag map to stop" : "Follow this vehicle"}
-      </Button>
     </Panel>
   );
 }

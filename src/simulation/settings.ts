@@ -1,7 +1,7 @@
 import { VEHICLE_ORDER, type VehicleType } from "@/vehicles/types";
 
 export const MIN_VEHICLES = 30;
-export const MAX_VEHICLES = 100;
+export const MAX_VEHICLES = 300;
 
 export interface SimSettings {
   vehicleCount: number;

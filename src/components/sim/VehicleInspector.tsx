@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import type { VehicleType } from "@/vehicles/types";
 import { Panel, PanelTitle } from "./Panel";
 
+export interface RouteSeg {
+  pts: number[];
+  level: 0 | 1 | 2;
+  name: string;
+  len: number;
+}
+
 export interface SelectedInfo {
   id: number;
   type: VehicleType;
@@ -16,7 +23,11 @@ export interface SelectedInfo {
   remainingKm: number;
   trips: number;
   /** remaining route edges with traffic level 0 free, 1 slow, 2 jammed */
-  path: { pts: number[]; level: 0 | 1 | 2 }[];
+  path: RouteSeg[];
+  heading: number;
+  x: number;
+  y: number;
+  etaMin: number;
 }
 
 export function VehicleInspector({

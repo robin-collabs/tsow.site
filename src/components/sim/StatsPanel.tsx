@@ -1,6 +1,7 @@
 import type { SimStats } from "@/simulation/engine";
 import { VEHICLE_ORDER, VEHICLE_TYPES } from "@/vehicles/types";
-import { Panel, PanelTitle } from "./Panel";
+import { useState } from "react";
+import { CollapseTitle, Panel } from "./Panel";
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -18,16 +19,17 @@ function fmtTime(t: number) {
 }
 
 export function StatsPanel({ stats, running, speed }: { stats: SimStats | null; running: boolean; speed: number }) {
+  const [open, setOpen] = useState(true);
   return (
-    <Panel className="w-[220px] p-3">
-      <PanelTitle>Live stats</PanelTitle>
+    <Panel className="w-[240px] p-3">
+      <CollapseTitle open={open} onToggle={() => setOpen((o) => !o)}>Live stats</CollapseTitle>
       <div className="mb-2 flex items-center gap-2 text-xs font-medium">
         <span
           className={`inline-block h-2 w-2 rounded-full ${running ? "bg-primary animate-pulse" : "bg-muted-foreground"}`}
         />
         {running ? "Running" : "Paused"} · {speed}× · {fmtTime(stats?.time ?? 0)}
       </div>
-      <div className="space-y-1">
+      {open && <div className="space-y-1">
         <Row label="Vehicles" value={String(stats?.total ?? 0)} />
         {VEHICLE_ORDER.map((t) => (
           <Row key={t} label={`  ${VEHICLE_TYPES[t].plural}`} value={String(stats?.counts[t] ?? 0)} />
@@ -37,7 +39,7 @@ export function StatsPanel({ stats, running, speed }: { stats: SimStats | null; 
         <Row label="Stopped" value={String(stats?.stopped ?? 0)} />
         <Row label="Trips done" value={String(stats?.trips ?? 0)} />
         <Row label="Recoveries" value={String(stats?.recoveries ?? 0)} />
-      </div>
+      </div>}
     </Panel>
   );
 }

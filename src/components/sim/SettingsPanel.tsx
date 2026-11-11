@@ -22,7 +22,7 @@ export function SettingsPanel({
   const [open, setOpen] = useState(true);
   const total = VEHICLE_ORDER.reduce((s, t) => s + settings.mix[t], 0) || 1;
   return (
-    <Panel className="w-[220px] p-3">
+    <Panel className="w-[240px] p-3">
       <button className="flex w-full items-center justify-between" onClick={() => setOpen((o) => !o)}>
         <PanelTitle>Traffic settings</PanelTitle>
         {open ? <ChevronUp className="mb-2 size-3.5" /> : <ChevronDown className="mb-2 size-3.5" />}

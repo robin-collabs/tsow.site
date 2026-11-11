@@ -1,6 +1,7 @@
 import { Eye, EyeOff, Plus } from "lucide-react";
 import { VEHICLE_ORDER, VEHICLE_TYPES, type VehicleType } from "@/vehicles/types";
-import { Panel, PanelTitle } from "./Panel";
+import { useState } from "react";
+import { CollapseTitle, Panel } from "./Panel";
 
 interface Props {
   hidden: Set<VehicleType>;
@@ -11,9 +12,11 @@ interface Props {
 }
 
 export function LegendPanel({ hidden, canSpawn, onToggle, onSpawn, fetchedAt }: Props) {
+  const [open, setOpen] = useState(true);
   return (
     <Panel className="w-[240px] p-3">
-      <PanelTitle>Vehicles</PanelTitle>
+      <CollapseTitle open={open} onToggle={() => setOpen((o) => !o)}>Vehicles</CollapseTitle>
+      {open && <>
       <div className="space-y-1">
         {VEHICLE_ORDER.map((t) => {
           const p = VEHICLE_TYPES[t];
@@ -65,6 +68,7 @@ export function LegendPanel({ hidden, canSpawn, onToggle, onSpawn, fetchedAt }: 
         </a>{" "}
         (ODbL){fetchedAt ? `, snapshot ${fetchedAt.slice(0, 10)}` : ""}.
       </p>
+      </>}
     </Panel>
   );
 }

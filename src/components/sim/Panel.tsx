@@ -21,3 +21,14 @@ export function PanelTitle({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+export function CollapseTitle({ open, onToggle, children }: { open: boolean; onToggle: () => void; children: ReactNode }) {
+  return (
+    <button className="flex w-full items-center justify-between" onClick={onToggle} aria-expanded={open}>
+      <PanelTitle>{children}</PanelTitle>
+      {open ? <ChevronUp className="mb-2 size-3.5" /> : <ChevronDown className="mb-2 size-3.5" />}
+    </button>
+  );
+}

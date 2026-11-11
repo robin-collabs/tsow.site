@@ -47,11 +47,14 @@ function describe(sim: Simulation, v: Vehicle): SelectedInfo {
     lanes: E.lanes,
     remainingKm: sim.remainingKm(v),
     trips: v.trips,
-    path: routePath(sim, v),
+    ...routeInfo(sim, v),
+    heading: v.heading,
+    x: v.x,
+    y: v.y,
   };
 }
 
-function routePath(sim: Simulation, v: Vehicle): SelectedInfo["path"] {
+function routeInfo(sim: Simulation, v: Vehicle): { path: SelectedInfo["path"]; etaMin: number } {
   const sum = new Map<number, [number, number]>();
   for (const o of sim.vehicles) {
     const e = o.route[o.ri]!;
@@ -61,12 +64,16 @@ function routePath(sim: Simulation, v: Vehicle): SelectedInfo["path"] {
     sum.set(e, a);
   }
   const out: SelectedInfo["path"] = [];
+  let eta = 0;
   for (let i = v.ri; i < v.route.length; i++) {
     const E = sim.graph.edges[v.route[i]!]!;
     const a = sum.get(E.id);
-    out.push({ pts: E.pts, level: trafficLevel(a ? a[0] / a[1] : null, E.speed) });
+    const level = trafficLevel(a ? a[0] / a[1] : null, E.speed);
+    out.push({ pts: E.pts, level, name: E.name, len: E.len });
+    // ETA: free-flow time per edge, stretched by congestion level
+    eta += E.len / E.speed / [0.85, 0.5, 0.2][level]!;
   }
-  return out;
+  return { path: out, etaMin: eta / 60 };
 }
 
 export function SimulatorView({ world }: { world: World }) {
@@ -98,6 +105,7 @@ export function SimulatorView({ world }: { world: World }) {
   const [settings, setSettings] = useState<SimSettings>(DEFAULT_SETTINGS);
   const [stats, setStats] = useState<SimStats | null>(null);
   const [selected, setSelected] = useState<SelectedInfo | null>(null);
+  const levelsRef = useRef<number[]>([]);
 
   const getNet = useCallback(
     (id: ZoneId) => {
@@ -179,6 +187,7 @@ export function SimulatorView({ world }: { world: World }) {
         hidden: hiddenRef.current,
         selectedId: selectedRef.current,
         zone,
+        routeLevels: levelsRef.current,
       });
       if (!readyMarked) {
         wrap.dataset["sceneReady"] = "true";
@@ -190,7 +199,11 @@ export function SimulatorView({ world }: { world: World }) {
         const sid = selectedRef.current;
         if (sid != null) {
           const v = sim.find(sid);
-          if (v) setSelected(describe(sim, v));
+          if (v) {
+            const d = describe(sim, v);
+            levelsRef.current = d.path.map((e) => e.level);
+            setSelected(d);
+          }
           else {
             setSelected(null);
             setSelectedId(null);
@@ -301,29 +314,8 @@ export function SimulatorView({ world }: { world: World }) {
             onSpeed={setSpeed}
             onZone={changeZone}
           />
-          <LegendPanel
-            hidden={hidden}
-            canSpawn={(stats?.total ?? 0) < MAX_VEHICLES}
-            onToggle={(t) =>
-              setHidden((h) => {
-                const n = new Set(h);
-                if (n.has(t)) n.delete(t);
-                else n.add(t);
-                return n;
-              })
-            }
-            onSpawn={spawn}
-            fetchedAt={world.ds.fetchedAt}
-          />
-        </div>
-        <div className="flex flex-col items-end justify-between gap-3">
-          <div className="flex flex-col items-end gap-3">
-            <StatsPanel stats={stats} running={running} speed={speed} />
-            <SettingsPanel settings={settings} onChange={updateSettings} />
-          </div>
-          <div className="flex items-end gap-3">
             {selected && (
-              <div className="flex flex-col gap-3">
+              <div className="flex max-h-[calc(100vh-260px)] flex-col gap-3 overflow-y-auto">
               {following && <RouteMinimap path={selected.path} color={selected.color} />}
               <VehicleInspector
                 info={selected}
@@ -337,6 +329,28 @@ export function SimulatorView({ world }: { world: World }) {
               />
               </div>
             )}
+        </div>
+        <div className="flex flex-col items-end justify-between gap-3">
+          <div className="flex max-h-[calc(100vh-140px)] flex-col items-end gap-3 overflow-y-auto">
+            <StatsPanel stats={stats} running={running} speed={speed} />
+            <LegendPanel
+            hidden={hidden}
+            canSpawn={(stats?.total ?? 0) < MAX_VEHICLES}
+            onToggle={(t) =>
+              setHidden((h) => {
+                const n = new Set(h);
+                if (n.has(t)) n.delete(t);
+                else n.add(t);
+                return n;
+              })
+            }
+            onSpawn={spawn}
+            fetchedAt={world.ds.fetchedAt}
+          />
+            <SettingsPanel settings={settings} onChange={updateSettings} />
+          </div>
+          <div className="flex items-end gap-3">
+
             <Panel className="flex flex-col p-1">
               <button onClick={() => zoomBy(1.4)} className="rounded p-2 hover:bg-accent" aria-label="Zoom in">
                 <Plus className="size-4" />

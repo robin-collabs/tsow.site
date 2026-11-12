@@ -12,6 +12,7 @@
 <p align="center">
   <strong>A browser based autonomous traffic simulator set on real roads in Chennai, India.</strong><br/>
   Explore a virtual Chennai, populate its roads with Indian vehicle types, and watch rule based autonomous drivers navigate the network.
+  A fun way to explore a breathing city but devoid of its people!
 </p>
 
 <p align="center">

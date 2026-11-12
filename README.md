@@ -1,6 +1,6 @@
 # Traffic Simulator On Web(TSOW).site 
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue?style=for-the-badge)](CHANGELOG.md) [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE.md) [![Deploy](https://img.shields.io/badge/deploy-GitHub%20Pages-black?style=for-the-badge&logo=github)](.github/workflows/deploy.yml)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue?style=for-the-badge)](CHANGELOG.md) [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE.md) [![Deploy](https://img.shields.io/badge/deploy-GitHub%20Pages-black?style=for-the-badge&logo=github)](.github/workflows/deploy.yml)
 ## Chennai Autonomous Traffic Simulator
 
 <p align="center">

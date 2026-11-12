@@ -17,8 +17,6 @@ export interface DrawOptions {
   hidden: Set<VehicleType>;
   selectedId: number | null;
   zone: BoundsM | null;
-  /** traffic level per remaining route edge (0 free, 1 slow, 2 jammed) */
-  routeLevels: number[];
 }
 
 const MIN_PX = [2.8, 2.2, 1.6, 1.1];
@@ -64,6 +62,7 @@ export class Renderer {
   private median = new Path2D();
   private lights: { e: number; x: number; y: number }[] = [];
   private pt: EdgePoint = { x: 0, y: 0, angle: 0 };
+  private labels: { name: string; x: number; y: number; a: number }[] = [];
 
   constructor(
     private graph: RoadGraph,
@@ -92,6 +91,14 @@ export class Renderer {
       }
     }
     this.groups = [...byKey.values()].sort((a, b) => a.width - b.width);
+    for (const E of graph.edges) {
+      if (!E.name || E.len < 40) continue;
+      pointAt(E, E.len / 2, this.pt);
+      let a = this.pt.angle;
+      if (a > Math.PI / 2) a -= Math.PI;
+      if (a < -Math.PI / 2) a += Math.PI;
+      this.labels.push({ name: E.name, x: this.pt.x, y: this.pt.y, a });
+    }
     for (const e of signals.controlled) {
       const E = graph.edges[e]!;
       pointAt(E, Math.max(0, E.len - 1.5), this.pt);
@@ -181,52 +188,32 @@ export class Renderer {
       ctx.setLineDash([]);
     }
 
-    const selected = opts.selectedId != null ? sim.find(opts.selectedId) : undefined;
-    if (selected) {
-      const css = getComputedStyle(document.documentElement);
-      const cols = ["--route-free", "--route-slow", "--route-jam"].map((k) => css.getPropertyValue(k).trim());
-      ctx.lineWidth = Math.max(1.5, 5 * px);
-      ctx.globalAlpha = 0.9;
-      const named: { name: string; x: number; y: number; a: number }[] = [];
-      const seen = new Set<string>();
-      for (let i = selected.ri; i < selected.route.length; i++) {
-        const E = this.graph.edges[selected.route[i]!]!;
-        const pts = E.pts;
-        ctx.strokeStyle = cols[opts.routeLevels[i - selected.ri] ?? 0] || pal.accent;
-        ctx.beginPath();
-        if (i === selected.ri) ctx.moveTo(selected.x, selected.y);
-        else ctx.moveTo(pts[0]!, pts[1]!);
-        for (let k = 0; k < pts.length; k += 2) ctx.lineTo(pts[k]!, pts[k + 1]!);
-        ctx.stroke();
-        if (E.name && !seen.has(E.name) && pts.length >= 4) {
-          seen.add(E.name);
-          const m = Math.floor(pts.length / 4) * 2;
-          const n = Math.min(m + 2, pts.length - 2);
-          let ang = Math.atan2(pts[n + 1]! - pts[m - 1 < 0 ? 1 : m + 1]!, pts[n]! - pts[m]!);
-          if (ang > Math.PI / 2) ang -= Math.PI;
-          if (ang < -Math.PI / 2) ang += Math.PI;
-          named.push({ name: E.name, x: pts[m]!, y: pts[m + 1]!, a: ang });
-        }
+    // Road names along the roads (one label per visible name, nearest the view centre)
+    if (z > 0.6) {
+      const best = new Map<string, { x: number; y: number; a: number; d: number }>();
+      for (const l of this.labels) {
+        if (!inView(l.x, l.y)) continue;
+        const d = Math.hypot(l.x - cam.cx, l.y - cam.cy);
+        const cur = best.get(l.name);
+        if (!cur || d < cur.d) best.set(l.name, { ...l, d });
       }
-      ctx.globalAlpha = 1;
-      if (z > 0.15) {
-        ctx.font = `600 ${12 * px}px "Space Grotesk", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        for (const l of named) {
-          if (!inView(l.x, l.y)) continue;
-          ctx.save();
-          ctx.translate(l.x, l.y);
-          ctx.rotate(l.a);
-          ctx.lineWidth = 3 * px;
-          ctx.strokeStyle = pal.ground;
-          ctx.strokeText(l.name, 0, -8 * px);
-          ctx.fillStyle = cols[0] || pal.accent;
-          ctx.fillText(l.name, 0, -8 * px);
-          ctx.restore();
-        }
+      ctx.font = `600 ${12 * px}px "Space Grotesk", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineWidth = 3 * px;
+      ctx.strokeStyle = pal.road;
+      ctx.fillStyle = pal.label;
+      for (const [name, l] of best) {
+        ctx.save();
+        ctx.translate(l.x, l.y);
+        ctx.rotate(l.a);
+        ctx.strokeText(name, 0, 0);
+        ctx.fillText(name, 0, 0);
+        ctx.restore();
       }
     }
+
+    const selected = opts.selectedId != null ? sim.find(opts.selectedId) : undefined;
 
     for (const v of sim.vehicles) {
       if (opts.hidden.has(v.type) || !inView(v.x, v.y)) continue;

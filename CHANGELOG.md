@@ -1,6 +1,6 @@
 # Changelog
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue?style=for-the-badge)](#020---2026-11-11)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue?style=for-the-badge)](#030---2026-11-12)
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-green?style=for-the-badge)](https://semver.org)
 [![Keep a Changelog](https://img.shields.io/badge/changelog-keep%20a%20changelog-orange?style=for-the-badge)](https://keepachangelog.com)
 
@@ -8,6 +8,23 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com) and [S
 
 ## [Unreleased]
 - Residential-road OSM re-import, multi-district OD-matrix trip editor (see `docs/V2_SPEC.md`).
+
+## [0.3.0] - 2026-11-12
+![v0.3.0](https://img.shields.io/badge/v0.3.0-minor-blue?style=for-the-badge)
+
+### Added
+- Navigation-style minimap: heading-up, road name pill, remaining km (1 dp) and ETA in minutes; route coloured blue / amber / red by traffic.
+- Road names drawn in white along the roads on the main map.
+- Loading screen with percentage progress bar and rotating Chennai traffic facts.
+- Collapse buttons on Live stats and Vehicles cards.
+
+### Changed
+- Selected-vehicle card and minimap moved to the left; Live stats, Vehicles and Traffic settings stacked on the right.
+- Speed buttons (0.5× – 4×) no longer clipped.
+- Pages workflow builds with the correct base path for project sub-folders.
+
+### Removed
+- Journey path overlay on the main map (route now shown only in the minimap).
 
 ## [0.2.0] - 2026-11-11
 ![v0.2.0](https://img.shields.io/badge/v0.2.0-minor-blue?style=for-the-badge)

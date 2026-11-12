@@ -19,7 +19,7 @@ interface Props {
 export function ControlPanel({ running, speed, zoneId, onToggle, onReset, onSpeed, onZone }: Props) {
   const zone = ZONES.find((z) => z.id === zoneId)!;
   return (
-    <Panel className="w-[320px] p-3">
+    <Panel className="w-[340px] p-3">
       <div className="flex items-baseline justify-between">
         <h1 className="text-base font-bold tracking-tight">
           Chennai <span className="text-primary">Traffic Sim</span>
@@ -46,7 +46,7 @@ export function ControlPanel({ running, speed, zoneId, onToggle, onReset, onSpee
       <p className="mt-1.5 text-[11px] text-muted-foreground">{zone.areas}</p>
 
       <div className="mt-3 flex items-center gap-2">
-        <Button size="sm" onClick={onToggle} className="w-24" aria-label={running ? "Pause" : "Start"}>
+        <Button size="sm" onClick={onToggle} className="w-24 shrink-0" aria-label={running ? "Pause" : "Start"}>
           {running ? <Pause /> : <Play />}
           {running ? "Pause" : "Resume"}
         </Button>
@@ -54,13 +54,13 @@ export function ControlPanel({ running, speed, zoneId, onToggle, onReset, onSpee
           <RotateCcw />
           Reset
         </Button>
-        <div className="ml-auto flex overflow-hidden rounded-md border border-border">
+        <div className="ml-auto flex shrink-0 overflow-hidden rounded-md border border-border">
           {SPEEDS.map((s) => (
             <button
               key={s}
               onClick={() => onSpeed(s)}
               className={cn(
-                "px-1.5 py-1 font-mono text-[11px] transition-colors",
+                "whitespace-nowrap px-1.5 py-1 font-mono text-[11px] transition-colors",
                 s === speed ? "bg-primary text-primary-foreground" : "hover:bg-accent",
               )}
             >

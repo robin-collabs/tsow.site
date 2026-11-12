@@ -14,6 +14,7 @@ export interface Palette {
   green: string;
   amber: string;
   red: string;
+  label: string;
 }
 
 const KEYS: Record<keyof Palette, string> = {
@@ -31,6 +32,7 @@ const KEYS: Record<keyof Palette, string> = {
   green: "--sim-signal-green",
   amber: "--sim-signal-amber",
   red: "--sim-signal-red",
+  label: "--foreground",
 };
 
 export function readPalette(): Palette {

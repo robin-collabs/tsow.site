@@ -105,7 +105,6 @@ export function SimulatorView({ world }: { world: World }) {
   const [settings, setSettings] = useState<SimSettings>(DEFAULT_SETTINGS);
   const [stats, setStats] = useState<SimStats | null>(null);
   const [selected, setSelected] = useState<SelectedInfo | null>(null);
-  const levelsRef = useRef<number[]>([]);
 
   const getNet = useCallback(
     (id: ZoneId) => {
@@ -187,7 +186,6 @@ export function SimulatorView({ world }: { world: World }) {
         hidden: hiddenRef.current,
         selectedId: selectedRef.current,
         zone,
-        routeLevels: levelsRef.current,
       });
       if (!readyMarked) {
         wrap.dataset["sceneReady"] = "true";
@@ -200,9 +198,7 @@ export function SimulatorView({ world }: { world: World }) {
         if (sid != null) {
           const v = sim.find(sid);
           if (v) {
-            const d = describe(sim, v);
-            levelsRef.current = d.path.map((e) => e.level);
-            setSelected(d);
+            setSelected(describe(sim, v));
           }
           else {
             setSelected(null);

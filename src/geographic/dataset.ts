@@ -23,10 +23,22 @@ export interface RoadDataset {
 }
 
 /** Relative to the Vite base path, so the file also resolves under a GitHub Pages subpath. */
-export async function loadChennaiRoads(): Promise<RoadDataset> {
+export async function loadChennaiRoads(onProgress?: (f: number) => void): Promise<RoadDataset> {
   const res = await fetch(`${import.meta.env.BASE_URL}data/chennai-roads.json`);
   if (!res.ok) throw new Error(`Road data failed to load (${res.status})`);
-  return (await res.json()) as RoadDataset;
+  const total = Number(res.headers.get("content-length")) || 430_000;
+  if (!res.body || !onProgress) return (await res.json()) as RoadDataset;
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    got += value.length;
+    onProgress(Math.min(1, got / total));
+  }
+  return JSON.parse(await new Blob(chunks as BlobPart[]).text()) as RoadDataset;
 }
 
 /** Lat/lon to the dataset's local metre grid (y grows southwards). */

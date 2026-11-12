@@ -316,7 +316,7 @@ export function SimulatorView({ world }: { world: World }) {
           />
             {selected && (
               <div className="flex max-h-[calc(100vh-260px)] flex-col gap-3 overflow-y-auto">
-              {following && <RouteMinimap path={selected.path} color={selected.color} />}
+              {following && <RouteMinimap info={selected} />}
               <VehicleInspector
                 info={selected}
                 following={following}
